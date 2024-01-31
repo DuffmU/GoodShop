@@ -1,11 +1,26 @@
 package main
 
-import "net/http"
+import (
+	"fmt"
+	"log"
+	"net/http"
+)
 
-func (shop *recordsShop) routes() *http.ServeMux {
+type goodshopWebService struct {
+	shop   *recordsShop
+	router *http.ServeMux
+}
+
+func newgoodshopWebServer(sw *goodshopWebService) *goodshopWebService {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", shop.home)
-	mux.HandleFunc("/records", shop.showRecords)
+	mux.HandleFunc("/", sw.shop.home)
+	mux.HandleFunc("/records", sw.shop.showRecords)
+	sw.router = mux
+	return sw
+}
 
-	return mux
+func (sw *goodshopWebService) start() {
+	fmt.Printf("Запуск сервера на localhost:4000")
+	err := http.ListenAndServe(":4000", sw.router)
+	log.Fatal(err)
 }

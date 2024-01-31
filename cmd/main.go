@@ -1,10 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"good/goodservice/pkg/models/postgreSQL"
 	"log"
-	"net/http"
 )
 
 type recordsShop struct {
@@ -21,15 +19,8 @@ func main() {
 	}
 	defer db.Close()
 
-	shop := &recordsShop{records: &postgreSQL.GoodShopModel{DB: db}}
-
-	srv := &http.Server{
-		Addr:    ":4000",
-		Handler: shop.routes(),
-	}
-
-	fmt.Printf("Запуск сервера на %s", srv.Addr)
-	err = srv.ListenAndServe()
-	log.Fatal(err)
+	shopWS := &goodshopWebService{shop: &recordsShop{records: &postgreSQL.GoodShopModel{DB: db}}}
+	newgoodshopWebServer(shopWS)
+	shopWS.start()
 
 }
